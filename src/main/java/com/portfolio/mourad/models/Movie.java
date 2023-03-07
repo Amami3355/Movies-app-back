@@ -3,6 +3,7 @@ package com.portfolio.mourad.models;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ public class Movie {
     @Column(name = "movie_id")
     private Integer id;
 
+    @NotNull
     @Column(name = "tmdb_id")
     private Long tmdbID;
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -43,6 +44,17 @@ public class UserService {
         user.setLastName(lastName);
         System.out.println(user.toString());
         return userRepository.save(user);
+    }
+
+    public Integer generateRandomToken(){
+        int min = 100000;
+        int max = 999999;
+        Random random = new Random();
+        return random.nextInt(max - min + 1) + min;
+    }
+
+    public int updatePasswordByUserName(String username, String password){
+        return userRepository.updatePasswordByUsername(username, password);
     }
 
 }

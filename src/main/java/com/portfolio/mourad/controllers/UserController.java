@@ -15,9 +15,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +46,8 @@ public class UserController {
     private final UserRepository userRepository;
 
     private final EmailService emailService;
+
+    private final PasswordEncoder encoder;
 
     @GetMapping("all")
     public ResponseEntity<?> getAllUsers(){
@@ -86,7 +90,6 @@ public class UserController {
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> uploadAvatar(@PathVariable(name = "id") Integer id,
                                  @RequestParam(name = "image") MultipartFile multipartFile) throws IOException {
-
         String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
         User user = userService.getUserById(id); // Getting the user from the db given the ID
 
@@ -104,8 +107,12 @@ public class UserController {
 
     @GetMapping("/get/image/{id}")
     public ResponseEntity<?> getImage(@PathVariable(name="id") Integer id){
+
         String FILE_PATH_ROOT = "user-photos/" + id + "/";
         String filename = userService.getUserById(id).getImgUrl();
+        if (id == null || filename == null || filename == ""){
+            return ResponseEntity.ok().body("data:image/jpeg;base64,");
+        }
         byte[] image = new byte[0];
         try {
             image = FileUtils.readFileToByteArray(new File(FILE_PATH_ROOT+filename));
@@ -118,33 +125,36 @@ public class UserController {
     }
 
 
-    @PutMapping("/change-password/{id}")
-    public ResponseEntity<?> UpdateUserPassword(@PathVariable("id") Integer id, @RequestParam("newPassword") String newPassword,
-                                   @RequestParam("confirmedPassword") String confirmedPassword,
-                                   Authentication authentication){
+    @PutMapping("/update-password/{usernameToken}")
+    public ResponseEntity<?> UpdateUserPassword(@PathVariable("usernameToken") String usernameToken, @RequestParam("newPassword") String newPassword,
+                                   @RequestParam("confirmedPassword") String confirmedPassword){
         if (!newPassword.equals(confirmedPassword)){
-            System.out.println(newPassword);
-            System.out.println(confirmedPassword);
-            System.out.println("bad request");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
-        System.out.println(userDetails.getEmail());
-        int min = 100000;
-        int max = 999999;
-        Random random = new Random();
-        Integer randomNumber = random.nextInt(max - min + 1) + min;
-
-        emailService.sendSimpleMessage(userDetails.getEmail(), "Password Confirmation", "Vous avez initié un changement de mot de passe. Veillez utiliser le code ci dessous pour confirmer \n" +
-                randomNumber.toString());
-        return ResponseEntity.status(200).body(null);
+        String username = jwtUtils.getUserNameFromJwtTokenForPasswordChange(usernameToken);
+        User user = userService.getUserByUserName(username);
+        System.out.println(user.getEmail());
+        userService.updatePasswordByUserName(user.getUsername(), encoder.encode(newPassword));
+        emailService.sendSimpleMessage(user.getEmail(), "Password Confirmation",
+                "Votre mot de passe est bien modifié \n");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
     @PostMapping("/test")
     public String test(){
         System.out.println("test");
         return "test";
+    }
+
+    @PostMapping("/send-password-token/{username}")
+    public void sendPasswordToken(@PathVariable("username") String username, Authentication authentication){
+        User user = userService.getUserByUserName(username);
+        System.out.println(user.getEmail());
+        String usernameToken = jwtUtils.generateTokenFromUserNameForPasswordChange(username);
+        emailService.sendSimpleMessage(user.getEmail(), "Modification de mot de passe",
+                "Veillez clicker sur le lien suivant afin de modifier votre mot de passe \n\n" +
+                        "http://localhost:3000/update-password/" + usernameToken);
+
     }
 
 

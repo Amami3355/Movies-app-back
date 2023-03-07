@@ -12,10 +12,10 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "users",
-       uniqueConstraints = {
-           @UniqueConstraint(columnNames = "user_name"),
-           @UniqueConstraint(columnNames = "email")
-       })
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "user_name"),
+                @UniqueConstraint(columnNames = "email")
+        })
 @AllArgsConstructor
 public class User {
   @Id
@@ -48,9 +48,9 @@ public class User {
   private String imgUrl;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "user_roles", 
-             joinColumns = @JoinColumn(name = "user_id"),
-             inverseJoinColumns = @JoinColumn(name = "role_id"))
+  @JoinTable(name = "user_roles",
+          joinColumns = @JoinColumn(name = "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
 
 

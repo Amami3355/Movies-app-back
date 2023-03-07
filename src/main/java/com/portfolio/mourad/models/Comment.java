@@ -23,8 +23,8 @@ public class Comment {
 
     private OffsetDateTime date;
 
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-//    @JoinColumn(name = "movie_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "movie_id")
     private Integer movieId;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)

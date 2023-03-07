@@ -26,7 +26,7 @@ public class CommentService {
 
 
     public List<Comment> getCommentsByMovie(Integer id){
-        return commentRepository.findByMovieIdOrderByDateDesc(id);
+        return commentRepository.getCommentsByMovieOrderByDateDesc(id);
     }
 
 

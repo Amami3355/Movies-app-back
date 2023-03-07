@@ -22,6 +22,9 @@ public class JwtUtils {
   @Value("${mourad.app.jwtSecret}")
   private String jwtSecret;
 
+  @Value("${mourad.app.passwordSecret}")
+  private String passwordSecret;
+
   @Value("${mourad.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
@@ -56,6 +59,10 @@ public class JwtUtils {
     return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
   }
 
+  public String getUserNameFromJwtTokenForPasswordChange(String token) {
+    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+  }
+
   public boolean validateJwtToken(String authToken) {
     try {
       Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
@@ -83,4 +90,14 @@ public class JwtUtils {
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
         .compact();
   }
+
+  public String generateTokenFromUserNameForPasswordChange(String username){
+    return Jwts.builder()
+            .setSubject(username)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+            .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact();
+  }
+
 }

@@ -11,7 +11,6 @@ import com.portfolio.mourad.services.CommentService;
 import com.portfolio.mourad.services.MovieService;
 import com.portfolio.mourad.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -35,9 +34,10 @@ public class CommentController {
 
 
     @GetMapping("/{movieId}")
-    public List<Comment> getCommentsByMovie(@PathVariable(name = "movieId") Integer movieId){
-        System.out.println(commentService.getCommentsByMovie(movieId));
-        return commentService.getCommentsByMovie(movieId);
+    public ResponseEntity<List<Comment>> getCommentsByMovie(@PathVariable(name = "movieId") Integer movieId){
+        List<Comment> comments = commentService.getCommentsByMovie(movieId);
+        System.out.println(comments);
+        return ResponseEntity.ok().body(comments);
     }
 
     @PostMapping("/create")
