@@ -13,19 +13,22 @@ import java.util.Set;
 @AllArgsConstructor @NoArgsConstructor  @ToString
 public class Movie {
 
+    public Movie(Long tmdbID){
+        this.tmdbID = tmdbID;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movie_id")
     private Integer id;
 
-    @NotNull
     @Column(name = "tmdb_id")
     private Long tmdbID;
 
 
 //    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 //    private List<Comment> comments;
-//
+
 //    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 //    private List<Rate> rates;
 

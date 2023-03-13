@@ -5,9 +5,14 @@ import com.portfolio.mourad.models.User;
 import com.portfolio.mourad.repository.UserRepository;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 
@@ -55,6 +60,23 @@ public class UserService {
 
     public int updatePasswordByUserName(String username, String password){
         return userRepository.updatePasswordByUsername(username, password);
+    }
+
+    public String getUserImageData(Integer userId){
+        String FILE_PATH_ROOT = "user-photos/" + userId + "/";
+        String filename = getUserById(userId).getImgUrl();
+        if (userId == null || filename == null || filename == ""){
+            return "data:image/jpeg;base64,";
+        }
+        byte[] image = new byte[0];
+        try {
+            image = FileUtils.readFileToByteArray(new File(FILE_PATH_ROOT+filename));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String base64Image = Base64.getEncoder().encodeToString(image);
+        String dataUrl = "data:image/jpeg;base64," + base64Image;
+        return dataUrl;
     }
 
 }

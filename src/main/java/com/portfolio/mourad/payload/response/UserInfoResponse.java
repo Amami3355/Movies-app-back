@@ -12,6 +12,24 @@ public class UserInfoResponse {
 
 	private String jwtCookie;
 
+	private String imageData;
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public void setImageData(String imageData) {
+		this.imageData = imageData;
+	}
+
+	public String getImageData() {
+		return imageData;
+	}
+
 	public String getFirstName() {
 		return firstName;
 	}
@@ -33,6 +51,7 @@ public class UserInfoResponse {
 							String lastName,
 							List<String> roles,
 							String jwtCookie,
+							String imageData,
 							String password) {
 		this.id = id;
 		this.username = username;
@@ -42,6 +61,7 @@ public class UserInfoResponse {
 		this.roles = roles;
 		this.jwtCookie = jwtCookie;
 		this.password = password;
+		this.imageData = imageData;
 	}
 
 	public String getJwtCookie() {

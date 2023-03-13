@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
+
 import java.util.Optional;
 
 @Service
@@ -17,11 +17,11 @@ public class MovieService {
 
 
     public Movie getMovieById(Integer id){
-        return movieRepository.findById(id).get();
+        return movieRepository.findById(id).orElse(null);
     }
 
     public Movie addMovie(Long movieId){
-        Movie movie = new Movie(null, movieId);
+        Movie movie = new Movie(movieId);
         return movieRepository.save(movie);
     }
 

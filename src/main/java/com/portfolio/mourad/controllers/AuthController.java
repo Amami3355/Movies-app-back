@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.portfolio.mourad.mailing.service.EmailService;
+import com.portfolio.mourad.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import com.portfolio.mourad.models.ERole;
@@ -41,6 +43,9 @@ public class AuthController {
   UserRepository userRepository;
 
   @Autowired
+  UserService userService;
+
+  @Autowired
   RoleRepository roleRepository;
 
   @Autowired
@@ -51,6 +56,12 @@ public class AuthController {
 
   @Autowired
   EmailService emailService;
+
+
+//  @GetMapping("/csrf")
+//  public CsrfToken csrf(CsrfToken token) {
+//    return token;
+//  }
 
   @PostMapping("/signin")
 //  @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -85,7 +96,9 @@ public class AuthController {
                                    user.getEmail(),
                                    user.getFirstName(),
                                    user.getLastName(),
-                                   roles, jwt, "password"));
+                                   roles, jwt,
+                                   userService.getUserImageData(user.getId()),
+                           "password"));
   }
 
   @PostMapping("/signup")

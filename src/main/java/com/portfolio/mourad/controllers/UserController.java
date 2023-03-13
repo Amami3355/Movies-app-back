@@ -11,6 +11,7 @@ import com.portfolio.mourad.services.MovieService;
 import com.portfolio.mourad.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -62,10 +63,12 @@ public class UserController {
     }
 
     @PostMapping("/add-to-watchlist")
-    public void addMovieToUserWatchList(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,@RequestParam(name = "movieId")  Long movieId){
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    public void addMovieToUserWatchList(@RequestParam(name = "movieId")  Long movieId, Authentication authentication){
         System.out.println(movieId);
-        String username = jwtUtils.getUserNameFromJwtToken(jwt);
-        User user = userService.getUserByUserName(username);
+//        String username = jwtUtils.getUserNameFromJwtToken(Authorization);
+        UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
+        User user = userService.getUserByUserName(userDetails.getUsername());
         Movie movie;
         if (movieService.getMovieByTmdbID(movieId).isPresent()){
             movie = movieService.getMovieByTmdbID(movieId).get();
@@ -76,6 +79,8 @@ public class UserController {
 
         userService.addMovieToUserWatchList(user, movie);
     }
+
+
 
 
     @PostMapping("/update")

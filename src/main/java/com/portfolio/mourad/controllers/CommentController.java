@@ -1,10 +1,7 @@
 package com.portfolio.mourad.controllers;
 
 import com.portfolio.mourad.models.Comment;
-import com.portfolio.mourad.models.Movie;
-import com.portfolio.mourad.models.User;
-import com.portfolio.mourad.repository.CommentRepository;
-import com.portfolio.mourad.repository.MovieRepository;
+import com.portfolio.mourad.payload.response.CommentPayload;
 import com.portfolio.mourad.requests.CreateCommentRequest;
 import com.portfolio.mourad.security.services.UserDetailsImpl;
 import com.portfolio.mourad.services.CommentService;
@@ -17,8 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/comments")
@@ -34,11 +31,24 @@ public class CommentController {
 
 
     @GetMapping("/{movieId}")
-    public ResponseEntity<List<Comment>> getCommentsByMovie(@PathVariable(name = "movieId") Integer movieId){
+    public ResponseEntity<List<CommentPayload>> getCommentsByMovie(@PathVariable(name = "movieId") Integer movieId){
         List<Comment> comments = commentService.getCommentsByMovie(movieId);
-        System.out.println(comments);
-        return ResponseEntity.ok().body(comments);
+        List<CommentPayload> response = new ArrayList<>();
+        for (Comment comment : comments){
+            CommentPayload commentPayload = new CommentPayload();
+            commentPayload.setId(comment.getId());
+            commentPayload.setText(comment.getText());
+            commentPayload.setOwner(comment.getUser().getUsername());
+            commentPayload.setMovieId(comment.getMovieId());
+            commentPayload.setImageData(userService.getUserImageData(comment.getUser().getId()));
+            commentPayload.setDate(comment.getDate());
+            response.add(commentPayload);
+        }
+
+//        System.out.println(response);
+        return ResponseEntity.ok().body(response);
     }
+
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
