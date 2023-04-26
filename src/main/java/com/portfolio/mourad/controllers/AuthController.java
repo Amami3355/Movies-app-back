@@ -58,10 +58,10 @@ public class AuthController {
   EmailService emailService;
 
 
-//  @GetMapping("/csrf")
-//  public CsrfToken csrf(CsrfToken token) {
-//    return token;
-//  }
+  @GetMapping("/csrf")
+  public CsrfToken csrf(CsrfToken token) {
+    return token;
+  }
 
   @PostMapping("/signin")
 //  @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
